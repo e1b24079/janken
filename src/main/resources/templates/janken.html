@@ -9,6 +9,20 @@
 <body>
   <h1>じゃんけん勝負</h1>
   <p th:if="${username}">Hi [[${username}]]</p>
+
+<p>
+    手を選んでください：
+    <a href="/jankengame?hand=gu">グー</a>
+    <a href="/jankengame?hand=choki">チョキ</a>
+    <a href="/jankengame?hand=pa">パー</a>
+</p>
+
+<div th:if="${janken}">
+    <p>あなたの手：[[${janken.playerHand}]]</p>
+    <p>相手の手：[[${janken.cpuHand}]]</p>
+    <p>結果：[[${janken.result}]]</p>
+</div>
+
 </body>
 
 </html>
