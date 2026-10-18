@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>じゃんけん</title>
+</head>
+
+<body>
+  <h1>じゃんけん</h1>
+
+  <!-- POSTで名前を送る -->
+  <form action="/janken" method="post">
+    名前：<input type="text" name="name">
+    <input type="submit" value="送信">
+  </form>
+  <p th:if="${name}">こんにちは <span th:text="${name}"></span> さん</p>
+
+  <!-- GETで手を送る -->
+  <h2>手を選んでください</h2>
+  <a href="/janken/game?hand=Gu">グー</a>
+  <a href="/janken/game?hand=Choki">チョキ</a>
+  <a href="/janken/game?hand=Pa">パー</a>
+
+  <!-- Thymeleafで結果を表示 -->
+  <div th:if="${result}">
+    <p>あなたの手：<span th:text="${myHand}"></span></p>
+    <p>相手の手：<span th:text="${cpuHand}"></span></p>
+    <p th:text="${result}"></p>
+  </div>
+</body>
+
+</html>
