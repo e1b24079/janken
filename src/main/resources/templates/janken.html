@@ -12,11 +12,9 @@
     <a href="/logout">ログアウト</a>
   </p>
 
-  <!-- エントリーしている全ユーザ -->
   <h2>エントリー</h2>
-  <p th:text="|今${entry.userCount}人がエントリーしています|"></p>
   <ul>
-    <li th:each="user : ${entry.users}" th:text="${user}"></li>
+    <li th:each="user : ${users}">[[${user.name}]]</li>
   </ul>
 
   <!-- POSTで名前を送る -->

@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z3524.kaizi.janken.model.Entry;
+import oit.is.z3524.kaizi.janken.model.UserMapper;
 
 @Controller
 public class JankenController {
 
   @Autowired
   private Entry entry; // DIによりSpringが生成した1つのEntryが注入される
+  @Autowired
+  private UserMapper userMapper;
 
   // ログインユーザをエントリーに追加し，画面表示用の値をModelに入れる
   private void setEntry(Principal prin, ModelMap model) {
@@ -23,6 +26,7 @@ public class JankenController {
     this.entry.addUser(loginUser);
     model.addAttribute("loginUser", loginUser);
     model.addAttribute("entry", this.entry);
+    model.addAttribute("users", userMapper.selectAllUsers());
   }
 
   // GET：じゃんけん画面を表示する
