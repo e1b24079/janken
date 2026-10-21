@@ -20,7 +20,7 @@ public class JankenAuthConfiguration {
             .logoutUrl("/logout")
             .logoutSuccessUrl("/"))
         .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/janken/**").authenticated()
+            .requestMatchers("/janken/**", "/match/**", "/fight/**").authenticated()
             .anyRequest().permitAll());
     return http.build();
   }
@@ -32,6 +32,10 @@ public class JankenAuthConfiguration {
     UserDetails user2 = User.withUsername("user2")
         .password("{bcrypt}$2a$10$nlwHMIud1ItxYBC9bU8vA.oaRSZTbMskO6SMg/jj8OIuYBmWK9d2C").roles("USER").build();
 
-    return new InMemoryUserDetailsManager(user1, user2);
+    UserDetails honda = User.withUsername("ほんだ")
+        .password("{bcrypt}$2a$10$nlwHMIud1ItxYBC9bU8vA.oaRSZTbMskO6SMg/jj8OIuYBmWK9d2C").roles("USER").build();
+
+    return new InMemoryUserDetailsManager(user1, user2, honda);
+
   }
 }
