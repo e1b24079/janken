@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z3524.kaizi.janken.model.Entry;
 import oit.is.z3524.kaizi.janken.model.UserMapper;
+import oit.is.z3524.kaizi.janken.model.MatchMapper;
 
 @Controller
 public class JankenController {
@@ -19,6 +20,8 @@ public class JankenController {
   private Entry entry; // DIによりSpringが生成した1つのEntryが注入される
   @Autowired
   private UserMapper userMapper;
+  @Autowired
+  private MatchMapper matchMapper;
 
   // ログインユーザをエントリーに追加し，画面表示用の値をModelに入れる
   private void setEntry(Principal prin, ModelMap model) {
@@ -27,6 +30,7 @@ public class JankenController {
     model.addAttribute("loginUser", loginUser);
     model.addAttribute("entry", this.entry);
     model.addAttribute("users", userMapper.selectAllUsers());
+    model.addAttribute("matches", matchMapper.selectAllMatches());
   }
 
   // GET：じゃんけん画面を表示する
