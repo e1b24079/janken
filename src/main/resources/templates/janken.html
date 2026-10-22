@@ -14,13 +14,13 @@
 
   <h2>エントリー</h2>
   <ul>
-    <li th:each="user : ${users}">[[${user.name}]]</li>
+        <li th:each="user : ${users}"><a th:href="@{/match(id=${user.id})}">[[${user.name}]]</a></li>
   </ul>
   <h2>試合結果</h2>
   <p th:each="m : ${matches}">
     id:[[${m.id}]] user1:[[${m.user1}]] user2:[[${m.user2}]] user1の手:[[${m.user1Hand}]] user2の手:[[${m.user2Hand}]]
   </p>
-  
+
   <!-- POSTで名前を送る -->
   <form action="/janken" method="post">
     名前：<input type="text" name="name">
