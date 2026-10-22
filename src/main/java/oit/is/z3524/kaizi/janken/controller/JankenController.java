@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import oit.is.z3524.kaizi.janken.model.Entry;
 import oit.is.z3524.kaizi.janken.model.UserMapper;
 import oit.is.z3524.kaizi.janken.model.MatchMapper;
+import oit.is.z3524.kaizi.janken.model.User;
+import oit.is.z3524.kaizi.janken.model.Match;
 
 @Controller
 public class JankenController {
@@ -77,6 +79,40 @@ public class JankenController {
   public String match(@RequestParam Integer id, Principal prin, ModelMap model) {
     model.addAttribute("loginUser", prin.getName());
     model.addAttribute("opponent", userMapper.selectById(id));
+    return "match.html";
+  }
+  @GetMapping("/fight")
+  public String fight(@RequestParam Integer id, @RequestParam String hand, Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    User me = userMapper.selectByName(loginUser);
+    User opponent = userMapper.selectById(id);
+
+    String[] hands = { "Gu", "Choki", "Pa" };
+    String cpuHand = hands[(int) (Math.random() * 3)];
+
+    String result;
+    if (hand.equals(cpuHand)) {
+      result = "Draw";
+    } else if ((hand.equals("Gu") && cpuHand.equals("Choki"))
+        || (hand.equals("Choki") && cpuHand.equals("Pa"))
+        || (hand.equals("Pa") && cpuHand.equals("Gu"))) {
+      result = "You Win!";
+    } else {
+      result = "You Lose";
+    }
+
+    Match match = new Match();
+    match.setUser1(me.getId());
+    match.setUser2(opponent.getId());
+    match.setUser1Hand(hand);
+    match.setUser2Hand(cpuHand);
+    matchMapper.insertMatch(match);
+
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent);
+    model.addAttribute("myHand", hand);
+    model.addAttribute("cpuHand", cpuHand);
+    model.addAttribute("result", result);
     return "match.html";
   }
 }
