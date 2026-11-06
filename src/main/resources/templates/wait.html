@@ -4,11 +4,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Wait</title>
+  <script>
+    window.onload = function () {
+      var sse = new EventSource('/result');
+      sse.onmessage = function (event) {
+        console.log("sse.onmessage")
+        console.log(event.data);
+        var match_list = JSON.parse(event.data);//JSONオブジェクトとしてparse
+        var result = "";
+        // isActiveがTRUEの試合結果のリストがJSONオブジェクトとして得られるので，htmlを作成し，divの中身毎入れ替える
+        for (var i = 0; i < match_list.length; i++) {
+          var m = "Match: id " + match_list[i].id + " user1: " + match_list[i].user1 + " user2: " + match_list[i].user2
+            + " user1Hand: " + match_list[i].user1Hand + " user2Hand: " + match_list[i].user2Hand + "<br>";
+          result = result + m;
+        }
+        console.log(result);
+        if (match_list.length > 0) {
+          var div = document.getElementById("result");
+          div.innerHTML = "<h3>結果</h3>" + result + "<a href='/janken'>もどる</a>";//idがresultのdivのHTMLを差し替える
+        }
+      }
+    }
+  </script>
 </head>
 
 <body>
-  <h1>相手の手を待ってます</h1>
+  <h2>相手の手を待ってます</h2>
   <p>Hi [[${loginUser}]]</p>
+  <div id="result"></div>
 </body>
 
 </html>

@@ -9,6 +9,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import oit.is.z3524.kaizi.janken.model.Entry;
 import oit.is.z3524.kaizi.janken.model.UserMapper;
@@ -17,6 +18,7 @@ import oit.is.z3524.kaizi.janken.model.User;
 import oit.is.z3524.kaizi.janken.model.Match;
 import oit.is.z3524.kaizi.janken.model.MatchInfo;
 import oit.is.z3524.kaizi.janken.model.MatchInfoMapper;
+import oit.is.z3524.kaizi.janken.service.AsyncKekka;
 
 @Controller
 public class JankenController {
@@ -29,6 +31,8 @@ public class JankenController {
   private MatchMapper matchMapper;
   @Autowired
   private MatchInfoMapper matchInfoMapper;
+  @Autowired
+  private AsyncKekka asyncKekka;
 
   // ログインユーザをエントリーに追加し，画面表示用の値をModelに入れる
   private void setEntry(Principal prin, ModelMap model) {
@@ -105,7 +109,7 @@ public class JankenController {
       match.setUser1Hand(info.getUser1Hand());
       match.setUser2Hand(hand);
       match.setIsActive(true);
-      matchMapper.insertMatch(match);
+      asyncKekka.syncInsertMatch(match);
       // 成立したmatchinfoはFALSEにする
       matchInfoMapper.updateMatchInfoInactive(info.getId());
     } else {
@@ -120,5 +124,17 @@ public class JankenController {
 
     model.addAttribute("loginUser", loginUser);
     return "wait.html";
+  }
+
+  /**
+   * JavaScriptからEventSourceとして呼び出されるGETリクエスト SseEmitterを返すことで，PUSH型の通信を実現する
+   *
+   * @return
+   */
+  @GetMapping("/result")
+  public SseEmitter result() {
+    final SseEmitter sseEmitter = new SseEmitter();
+    this.asyncKekka.asyncShowMatchResult(sseEmitter);
+    return sseEmitter;
   }
 }
