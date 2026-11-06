@@ -22,7 +22,7 @@
   </p>
   <h2>試合結果</h2>
   <p th:each="m : ${matches}">
-    id:[[${m.id}]] user1:[[${m.user1}]] user2:[[${m.user2}]] user1の手:[[${m.user1Hand}]] user2の手:[[${m.user2Hand}]]
+    id:[[${m.id}]] user1:[[${m.user1}]] user2:[[${m.user2}]] user1の手:[[${m.user1Hand}]] user2の手:[[${m.user2Hand}]] isActive:[[${m.isActive}]]
   </p>
 
   <!-- POSTで名前を送る -->

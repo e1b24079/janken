@@ -1,6 +1,7 @@
 package oit.is.z3524.kaizi.janken.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import oit.is.z3524.kaizi.janken.model.Entry;
 import oit.is.z3524.kaizi.janken.model.UserMapper;
 import oit.is.z3524.kaizi.janken.model.MatchMapper;
 import oit.is.z3524.kaizi.janken.model.User;
+import oit.is.z3524.kaizi.janken.model.Match;
 import oit.is.z3524.kaizi.janken.model.MatchInfo;
 import oit.is.z3524.kaizi.janken.model.MatchInfoMapper;
 
@@ -85,18 +87,36 @@ public class JankenController {
     model.addAttribute("opponent", userMapper.selectById(id));
     return "match.html";
   }
-  // GET：手を受け取り，相手の手を待つ情報をmatchinfoに登録してwait.htmlを表示する
+  // GET：手を受け取り，相手が先に手を出していれば試合を成立させ，
+  // まだであれば相手の手を待つ情報をmatchinfoに登録してwait.htmlを表示する
   @GetMapping("/fight")
   public String fight(@RequestParam Integer id, @RequestParam String hand, Principal prin, ModelMap model) {
     String loginUser = prin.getName();
     User me = userMapper.selectByName(loginUser);
 
-    MatchInfo matchInfo = new MatchInfo();
-    matchInfo.setUser1(me.getId());
-    matchInfo.setUser2(id);
-    matchInfo.setUser1Hand(hand);
-    matchInfo.setIsActive(true);
-    matchInfoMapper.insertMatchInfo(matchInfo);
+    // 相手(id)が自分を指名して手を待っているmatchinfoを探す
+    ArrayList<MatchInfo> waiting = matchInfoMapper.selectActiveMatchInfoByUsers(id, me.getId());
+    if (!waiting.isEmpty()) {
+      // 試合成立：先に手を出した相手をuser1，後から手を出した自分をuser2としてmatchesに登録する
+      MatchInfo info = waiting.get(0);
+      Match match = new Match();
+      match.setUser1(info.getUser1());
+      match.setUser2(me.getId());
+      match.setUser1Hand(info.getUser1Hand());
+      match.setUser2Hand(hand);
+      match.setIsActive(true);
+      matchMapper.insertMatch(match);
+      // 成立したmatchinfoはFALSEにする
+      matchInfoMapper.updateMatchInfoInactive(info.getId());
+    } else {
+      // 相手がまだ手を出していないので，相手の手を待つ情報を登録する
+      MatchInfo matchInfo = new MatchInfo();
+      matchInfo.setUser1(me.getId());
+      matchInfo.setUser2(id);
+      matchInfo.setUser1Hand(hand);
+      matchInfo.setIsActive(true);
+      matchInfoMapper.insertMatchInfo(matchInfo);
+    }
 
     model.addAttribute("loginUser", loginUser);
     return "wait.html";
