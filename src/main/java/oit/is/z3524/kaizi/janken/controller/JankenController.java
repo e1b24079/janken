@@ -13,7 +13,8 @@ import oit.is.z3524.kaizi.janken.model.Entry;
 import oit.is.z3524.kaizi.janken.model.UserMapper;
 import oit.is.z3524.kaizi.janken.model.MatchMapper;
 import oit.is.z3524.kaizi.janken.model.User;
-import oit.is.z3524.kaizi.janken.model.Match;
+import oit.is.z3524.kaizi.janken.model.MatchInfo;
+import oit.is.z3524.kaizi.janken.model.MatchInfoMapper;
 
 @Controller
 public class JankenController {
@@ -24,6 +25,8 @@ public class JankenController {
   private UserMapper userMapper;
   @Autowired
   private MatchMapper matchMapper;
+  @Autowired
+  private MatchInfoMapper matchInfoMapper;
 
   // ログインユーザをエントリーに追加し，画面表示用の値をModelに入れる
   private void setEntry(Principal prin, ModelMap model) {
@@ -33,6 +36,7 @@ public class JankenController {
     model.addAttribute("entry", this.entry);
     model.addAttribute("users", userMapper.selectAllUsers());
     model.addAttribute("matches", matchMapper.selectAllMatches());
+    model.addAttribute("activeMatches", matchInfoMapper.selectActiveMatchInfo());
   }
 
   // GET：じゃんけん画面を表示する
@@ -81,38 +85,20 @@ public class JankenController {
     model.addAttribute("opponent", userMapper.selectById(id));
     return "match.html";
   }
+  // GET：手を受け取り，相手の手を待つ情報をmatchinfoに登録してwait.htmlを表示する
   @GetMapping("/fight")
   public String fight(@RequestParam Integer id, @RequestParam String hand, Principal prin, ModelMap model) {
     String loginUser = prin.getName();
     User me = userMapper.selectByName(loginUser);
-    User opponent = userMapper.selectById(id);
 
-    String[] hands = { "Gu", "Choki", "Pa" };
-    String cpuHand = hands[(int) (Math.random() * 3)];
-
-    String result;
-    if (hand.equals(cpuHand)) {
-      result = "Draw";
-    } else if ((hand.equals("Gu") && cpuHand.equals("Choki"))
-        || (hand.equals("Choki") && cpuHand.equals("Pa"))
-        || (hand.equals("Pa") && cpuHand.equals("Gu"))) {
-      result = "You Win!";
-    } else {
-      result = "You Lose";
-    }
-
-    Match match = new Match();
-    match.setUser1(me.getId());
-    match.setUser2(opponent.getId());
-    match.setUser1Hand(hand);
-    match.setUser2Hand(cpuHand);
-    matchMapper.insertMatch(match);
+    MatchInfo matchInfo = new MatchInfo();
+    matchInfo.setUser1(me.getId());
+    matchInfo.setUser2(id);
+    matchInfo.setUser1Hand(hand);
+    matchInfo.setIsActive(true);
+    matchInfoMapper.insertMatchInfo(matchInfo);
 
     model.addAttribute("loginUser", loginUser);
-    model.addAttribute("opponent", opponent);
-    model.addAttribute("myHand", hand);
-    model.addAttribute("cpuHand", cpuHand);
-    model.addAttribute("result", result);
-    return "match.html";
+    return "wait.html";
   }
 }
