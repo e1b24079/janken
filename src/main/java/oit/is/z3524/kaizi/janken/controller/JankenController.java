@@ -127,14 +127,14 @@ public class JankenController {
   }
 
   /**
-   * wait.htmlのJavaScriptからEventSourceとして呼び出されるGETリクエスト SseEmitterを返すことで，PUSH型の通信を実現する
+   * JavaScriptからEventSourceとして呼び出されるGETリクエスト SseEmitterを返すことで，PUSH型の通信を実現する
+   *
+   * @return
    */
   @GetMapping("/result")
-  public SseEmitter result(Principal prin) {
-    User me = userMapper.selectByName(prin.getName());
-    // 相手を待つ時間が長くても切れないように，タイムアウトしない(0)設定にする
-    final SseEmitter sseEmitter = new SseEmitter(0L);
-    this.asyncKekka.asyncShowMatchResult(sseEmitter, me.getId());
+  public SseEmitter result() {
+    final SseEmitter sseEmitter = new SseEmitter();
+    this.asyncKekka.asyncShowMatchResult(sseEmitter);
     return sseEmitter;
   }
 }

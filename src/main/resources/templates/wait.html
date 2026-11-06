@@ -10,22 +10,26 @@
       sse.onmessage = function (event) {
         console.log("sse.onmessage")
         console.log(event.data);
-        var match = JSON.parse(event.data);//JSONオブジェクトとしてparse
-        // 試合結果と[もどる]リンクのhtmlを作成し，idがresultのdivの中身を差し替える
-        var result = "<h2>結果</h2>"
-          + "<p>Match: id " + match.id + " user1: " + match.user1 + " user2: " + match.user2
-          + " user1Hand: " + match.user1Hand + " user2Hand: " + match.user2Hand + "</p>"
-          + "<a href='/janken'>もどる</a>";
-        document.getElementById("result").innerHTML = result;
-        // 結果を表示したら接続を閉じる(閉じないと自動で再接続される)
-        sse.close();
+        var match_list = JSON.parse(event.data);//JSONオブジェクトとしてparse
+        var result = "";
+        // isActiveがTRUEの試合結果のリストがJSONオブジェクトとして得られるので，htmlを作成し，divの中身毎入れ替える
+        for (var i = 0; i < match_list.length; i++) {
+          var m = "Match: id " + match_list[i].id + " user1: " + match_list[i].user1 + " user2: " + match_list[i].user2
+            + " user1Hand: " + match_list[i].user1Hand + " user2Hand: " + match_list[i].user2Hand + "<br>";
+          result = result + m;
+        }
+        console.log(result);
+        if (match_list.length > 0) {
+          var div = document.getElementById("result");
+          div.innerHTML = "<h3>結果</h3>" + result + "<a href='/janken'>もどる</a>";//idがresultのdivのHTMLを差し替える
+        }
       }
     }
   </script>
 </head>
 
 <body>
-  <h1>相手の手を待ってます</h1>
+  <h2>相手の手を待ってます</h2>
   <p>Hi [[${loginUser}]]</p>
   <div id="result"></div>
 </body>

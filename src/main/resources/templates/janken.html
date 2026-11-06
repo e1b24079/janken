@@ -7,23 +7,22 @@
 </head>
 
 <body>
-  <h1>じゃんけん</h1>
-  <p>ログインユーザ：<span th:text="${loginUser}"></span>
-    <a href="/logout">ログアウト</a>
-  </p>
+  <a href="/logout">ログアウト</a>
+  <h2>Janken GAME!</h2>
+  <p>Hi [[${loginUser}]]</p>
 
-  <h2>エントリー</h2>
+  <h3>エントリー</h3>
   <ul>
-        <li th:each="user : ${users}"><a th:href="@{/match(id=${user.id})}">[[${user.name}]]</a></li>
+    <li th:each="user : ${users}"><a th:href="@{/match(id=${user.id})}">[[${user.name}]]</a></li>
   </ul>
-  <h2>アクティブな試合</h2>
-  <p th:each="mi : ${activeMatches}">
+  <h3>アクティブな試合</h3>
+  <div th:each="mi : ${activeMatches}">
     id:[[${mi.id}]] user1:[[${mi.user1}]] user2:[[${mi.user2}]] isActive:[[${mi.isActive}]]
-  </p>
-  <h2>試合結果</h2>
-  <p th:each="m : ${matches}">
-    id:[[${m.id}]] user1:[[${m.user1}]] user2:[[${m.user2}]] user1の手:[[${m.user1Hand}]] user2の手:[[${m.user2Hand}]] isActive:[[${m.isActive}]]
-  </p>
+  </div>
+  <h3>試合結果</h3>
+  <div th:each="m : ${matches}">
+    id:[[${m.id}]] user1:[[${m.user1}]] user2:[[${m.user2}]] user1の手:[[${m.user1Hand}]] user2の手:[[${m.user2Hand}]]
+  </div>
 
   <!-- POSTで名前を送る -->
   <form action="/janken" method="post">
